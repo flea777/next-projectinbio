@@ -43,6 +43,4 @@
 
 body {
   background: var(--background-primary);
-  color: var(--content-body);
-  font-family: Arial, Helvetica, sans-serif;
 }
