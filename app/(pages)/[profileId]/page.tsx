@@ -1,8 +1,10 @@
-import { ProjectCard } from '@/app/components/commons/ProjectCard'
-import { TotalVisits } from '@/app/components/commons/TotalVisits'
-import { UserCard } from '@/app/components/commons/UserCard'
+import { ProjectCard } from '../../components/commons/ProjectCard'
+import { TotalVisits } from '../../components/commons/TotalVisits'
+import { UserCard } from '../../components/commons/UserCard'
 import { Plus } from 'lucide-react'
 import Link from 'next/link'
+import { getProfileData } from '../../server/get-profile-data'
+import { notFound } from 'next/navigation'
 
 export default async function ProfilePage({
   params,
@@ -10,6 +12,10 @@ export default async function ProfilePage({
   params: Promise<{ profileId: string }>
 }) {
   const { profileId } = await params
+
+  const profileData = await getProfileData(profileId)
+
+  if (!profileData) return notFound()
 
   return (
     <div className="relative h-screen flex p-20 overflow-hidden">

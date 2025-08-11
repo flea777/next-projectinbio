@@ -1,10 +1,10 @@
 'use client'
 
-import { createLink } from '@/app/actions/create-link'
-import { verifyLink } from '@/app/actions/verify-link'
-import { Button } from '@/app/components/ui/Button'
-import { TextInput } from '@/app/components/ui/TextInput'
-import { sanitizeLink } from '@/app/lib/utils'
+import { createLink } from '../../actions/create-link'
+import { verifyLink } from '../../actions/verify-link'
+import { Button } from '../../components/ui/Button'
+import { TextInput } from '../../components/ui/TextInput'
+import { sanitizeLink } from '../../lib/utils'
 import { useRouter } from 'next/navigation'
 import { ChangeEvent, FormEvent, useState } from 'react'
 

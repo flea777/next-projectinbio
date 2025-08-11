@@ -1,6 +1,6 @@
-import { auth } from '@/app/lib/auth'
+import { auth } from '../../lib/auth'
 import { Button } from '../ui/Button'
-import { manageAuth } from '@/app/actions/manage-auth'
+import { manageAuth } from '../../actions/manage-auth'
 
 export async function Header() {
   const session = await auth()

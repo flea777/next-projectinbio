@@ -1,8 +1,10 @@
-import { cn } from '@/app/lib/utils'
+import { cn } from '../../lib/utils'
 
-export function TextInput(props: React.InputHTMLAttributes<HTMLInputElement>) {
+export function TextArea(
+  props: React.TextareaHTMLAttributes<HTMLTextAreaElement>
+) {
   return (
-    <input
+    <textarea
       {...props}
       className={cn(
         `w-full p-3 bg-background-secondary text-white placeholder:text-content-placeholder rounded-xl 

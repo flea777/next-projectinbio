@@ -1,5 +1,5 @@
-import { Header } from '@/app/components/landing-page/Header'
-import { Button } from '@/app/components/ui/Button'
+import { Header } from '../../../components/landing-page/Header'
+import { Button } from '../../../components/ui/Button'
 
 export default function UpgradePage() {
   return (

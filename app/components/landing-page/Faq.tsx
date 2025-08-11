@@ -1,4 +1,4 @@
-import { TRIAL_DAYS } from '@/app/lib/config'
+import { TRIAL_DAYS } from '../../lib/config'
 
 export function Faq() {
   const faqItems = [

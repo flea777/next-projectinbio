@@ -1,4 +1,4 @@
-import { Header } from '@/app/components/landing-page/Header'
+import { Header } from '../../components/landing-page/Header'
 import { Rocket } from 'lucide-react'
 import { CreateLinkForm } from './CreateLinkForm'
 
