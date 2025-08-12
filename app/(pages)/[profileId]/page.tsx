@@ -1,21 +1,26 @@
 import { ProjectCard } from '../../components/commons/ProjectCard'
 import { TotalVisits } from '../../components/commons/TotalVisits'
 import { UserCard } from '../../components/commons/UserCard'
-import { Plus } from 'lucide-react'
 import Link from 'next/link'
 import { getProfileData } from '../../server/get-profile-data'
 import { notFound } from 'next/navigation'
+import { auth } from '../../lib/auth'
+import { NewProject } from './NewProject'
 
 export default async function ProfilePage({
   params,
 }: {
   params: Promise<{ profileId: string }>
 }) {
+  const session = await auth()
+
   const { profileId } = await params
 
   const profileData = await getProfileData(profileId)
 
   if (!profileData) return notFound()
+
+  const isProfileOwner = profileData.userId === session?.user?.id
 
   return (
     <div className="relative h-screen flex p-20 overflow-hidden">
@@ -40,10 +45,7 @@ export default async function ProfilePage({
         <ProjectCard />
         <ProjectCard />
         <ProjectCard />
-        <button className="cursor-pointer w-[340px] h-[132px] rounded-[20px] bg-[#0F0F10] flex items-center gap-2 justify-center hover:border hover:border-dashed border-border-secondary">
-          <Plus className="size-10 text-accent-green" />
-          <span>Novo projeto</span>
-        </button>
+        {isProfileOwner && <NewProject profileId={profileId} />}
       </div>
 
       <div className="absolute bottom-4 right-0 left-0 w-min mx-auto">
