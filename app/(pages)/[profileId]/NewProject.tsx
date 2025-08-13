@@ -1,18 +1,88 @@
 'use client'
 
 import { ArrowUpFromLine, Plus } from 'lucide-react'
-import { useState } from 'react'
+import { startTransition, useState } from 'react'
 import { Modal } from '../../components/ui/Modal'
 import { TextInput } from '../../components/ui/TextInput'
 import { Button } from '../../components/ui/Button'
 import { TextArea } from '../../components/ui/TextArea'
+import { compressFiles, isValidUrl } from '../../lib/utils'
+import { createProject } from '../../actions/create-project'
+import { useRouter } from 'next/navigation'
 
-export function NewProject({ profileId }: { profileId: string }) {
+interface NewProjectProps {
+  profileId: string
+}
+
+export function NewProject(props: NewProjectProps) {
+  const router = useRouter()
+
   const [isOpen, setIsOpen] = useState(false)
+  const [projectName, setProjectName] = useState('')
+  const [projectDescription, setProjectDescription] = useState('')
+  const [projectUrl, setProjectUrl] = useState('')
+  const [projectImage, setProjectImage] = useState<string | null>(null)
+  const [isCreatingProject, setIsCreatingProject] = useState(false)
+
+  const { profileId } = props
 
   const handleOpenModal = () => {
     setIsOpen(true)
   }
+
+  function triggerImageInput(id: string) {
+    document.getElementById(id)?.click()
+  }
+
+  function handleImageInput(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0] ?? null
+
+    if (file) {
+      return URL.createObjectURL(file)
+    }
+
+    return null
+  }
+
+  async function handleCreateProject() {
+    setIsCreatingProject(true)
+
+    const imagesInput = document.getElementById(
+      'imageInput'
+    ) as HTMLInputElement
+
+    if (!imagesInput.files) return
+
+    const compressedFile = await compressFiles(Array.from(imagesInput.files))
+
+    const formData = new FormData()
+
+    formData.append('file', compressedFile[0])
+    formData.append('profileId', profileId)
+    formData.append('projectName', projectName)
+    formData.append('projectDescription', projectDescription)
+    formData.append('projectUrl', projectUrl)
+
+    await createProject(formData)
+
+    startTransition(() => {
+      setIsOpen(false)
+      setIsCreatingProject(false)
+      setProjectName('')
+      setProjectDescription('')
+      setProjectUrl('')
+      setProjectImage('')
+      router.refresh
+    })
+  }
+
+const isFieldsNotFilled = () =>
+  projectName === '' ||
+  projectDescription === '' ||
+  projectUrl === '' ||
+  !isValidUrl(projectUrl) ||
+  projectImage === null
+
 
   return (
     <>
@@ -29,9 +99,25 @@ export function NewProject({ profileId }: { profileId: string }) {
           <div className="flex gap-10">
             <div className="flex flex-col items-center gap-3 text-xs">
               <div className="w-[100px] h-[100px] rounded-xl bg-background-tertiary overflow-hidden">
-                <button className="w-full h-full">100x100</button>
+                {projectImage ? (
+                  <img
+                    src={projectImage}
+                    alt="Imagem do projeto"
+                    className="object-cover object-center"
+                  />
+                ) : (
+                  <button
+                    className="w-full h-full cursor-pointer"
+                    onClick={() => triggerImageInput('imageInput')}
+                  >
+                    100x100
+                  </button>
+                )}
               </div>
-              <button className="text-white flex items-center gap-2">
+              <button
+                className="text-white flex items-center gap-2 cursor-pointer"
+                onClick={() => triggerImageInput('imageInput')}
+              >
                 <ArrowUpFromLine className="size-4" />
                 <span>Adicionar imagem</span>
               </button>
@@ -40,6 +126,7 @@ export function NewProject({ profileId }: { profileId: string }) {
                 id="imageInput"
                 accept="image/*"
                 className="hidden"
+                onChange={(e) => setProjectImage(handleImageInput(e))}
               />
             </div>
             <div className="flex flex-col gap-4 w-[293px]">
@@ -50,6 +137,8 @@ export function NewProject({ profileId }: { profileId: string }) {
                 <TextInput
                   id="project-name"
                   placeholder="Digite o nome do projeto"
+                  value={projectName}
+                  onChange={(e) => setProjectName(e.target.value)}
                 />
               </div>
               <div className="flex flex-col gap-1">
@@ -63,6 +152,8 @@ export function NewProject({ profileId }: { profileId: string }) {
                   id="project-description"
                   placeholder="Dê uma breve descrição do seu projeto"
                   className="h-36"
+                  value={projectDescription}
+                  onChange={(e) => setProjectDescription(e.target.value)}
                 />
               </div>
               <div className="flex flex-col gap-1">
@@ -73,13 +164,22 @@ export function NewProject({ profileId }: { profileId: string }) {
                   type="url"
                   id="project-description"
                   placeholder="Digite a URL do projeto"
+                  value={projectUrl}
+                  onChange={(e) => setProjectUrl(e.target.value)}
                 />
               </div>
             </div>
           </div>
           <div className="flex gap-4 justify-end">
-            <button className="font-bold text-white">Voltar</button>
-            <Button>Salvar</Button>
+            <button
+              className="font-bold text-white"
+              onClick={() => setIsOpen(false)}
+            >
+              Voltar
+            </button>
+            <Button onClick={handleCreateProject} disabled={isCreatingProject || isFieldsNotFilled()}>
+              Salvar
+            </Button>
           </div>
         </div>
       </Modal>
