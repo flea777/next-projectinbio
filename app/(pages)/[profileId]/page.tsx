@@ -1,5 +1,5 @@
 import { TotalVisits } from '../../components/commons/TotalVisits'
-import { UserCard } from '../../components/commons/UserCard'
+import { UserCard } from '../../components/commons/user-card/UserCard'
 import Link from 'next/link'
 import {
   getProfileData,

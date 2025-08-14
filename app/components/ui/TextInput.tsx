@@ -5,7 +5,7 @@ export function TextInput(props: React.InputHTMLAttributes<HTMLInputElement>) {
     <input
       {...props}
       className={cn(
-        `w-full p-3 bg-background-secondary text-white placeholder:text-content-placeholder rounded-xl 
+        `w-full p-3 bg-[#0F0F10] text-white placeholder:text-content-placeholder rounded-xl 
         border border-transparent hover:border-border-secondary hover:text-content-body active:border-border-tertiary`,
         props.className
       )}

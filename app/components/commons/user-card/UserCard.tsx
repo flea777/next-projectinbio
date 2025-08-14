@@ -1,8 +1,9 @@
 import { Github, Instagram, Linkedin, Twitter, Plus } from 'lucide-react'
-import { Button } from '../ui/Button'
+import { Button } from '../../ui/Button'
+import { EditSocialLinks } from './EditSocialLinks'
 
 export function UserCard() {
-  const icons = [Github, Instagram, Linkedin, Twitter, Plus]
+  const icons = [Github, Instagram, Linkedin, Twitter]
 
   return (
     <div
@@ -35,6 +36,7 @@ export function UserCard() {
               <Icon />
             </button>
           ))}
+          <EditSocialLinks />
         </div>
       </div>
       <div className="flex flex-col gap-3 w-full h-[172px]">
