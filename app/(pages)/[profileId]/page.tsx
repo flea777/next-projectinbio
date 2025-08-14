@@ -1,26 +1,31 @@
-import { ProjectCard } from '../../components/commons/ProjectCard'
 import { TotalVisits } from '../../components/commons/TotalVisits'
 import { UserCard } from '../../components/commons/UserCard'
 import Link from 'next/link'
-import { getProfileData } from '../../server/get-profile-data'
+import {
+  getProfileData,
+  getProfileProjects,
+} from '../../server/get-profile-data'
 import { notFound } from 'next/navigation'
 import { auth } from '../../lib/auth'
 import { NewProject } from './NewProject'
+import { getDownloadUrlFromPath } from '../../lib/firebase'
+import { ProjectCard } from '../../components/commons/ProjectCard'
 
 export default async function ProfilePage({
   params,
 }: {
   params: Promise<{ profileId: string }>
 }) {
-  const session = await auth()
-
   const { profileId } = await params
 
   const profileData = await getProfileData(profileId)
 
   if (!profileData) return notFound()
 
-  const isProfileOwner = profileData.userId === session?.user?.id
+  const projects = await getProfileProjects(profileId)
+
+  const session = await auth()
+  const isOwner = profileData.userId === session?.user?.id
 
   return (
     <div className="relative h-screen flex p-20 overflow-hidden">
@@ -38,14 +43,18 @@ export default async function ProfilePage({
       </div>
 
       <div className="w-full flex justify-center content-start gap-4 flex-wrap overflow-y-auto">
-        <ProjectCard />
-        <ProjectCard />
-        <ProjectCard />
-        <ProjectCard />
-        <ProjectCard />
-        <ProjectCard />
-        <ProjectCard />
-        {isProfileOwner && <NewProject profileId={profileId} />}
+        {projects.map(async (project) => (
+          <ProjectCard
+            key={project.id}
+            project={project}
+            isOwner={isOwner}
+            img={
+              project.imagePath ??
+              (await getDownloadUrlFromPath(project.imagePath))
+            }
+          />
+        ))}
+        {isOwner && <NewProject profileId={profileId} />}
       </div>
 
       <div className="absolute bottom-4 right-0 left-0 w-min mx-auto">
