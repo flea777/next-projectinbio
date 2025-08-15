@@ -2,12 +2,13 @@
 
 import {
   Github,
+  Instagram,
   Linkedin,
   LucideProps,
   Plus,
-  Instagram,
   Twitter,
 } from 'lucide-react'
+import { useParams, useRouter } from 'next/navigation'
 import {
   Dispatch,
   ForwardRefExoticComponent,
@@ -16,29 +17,38 @@ import {
   startTransition,
   useState,
 } from 'react'
-import { Modal } from '../../ui/Modal'
-import { Button } from '../../ui/Button'
-import { useParams } from 'next/navigation'
 import { addSocialLinks } from '../../../actions/create-social-links'
+import { Button } from '../../ui/Button'
+import { Modal } from '../../ui/Modal'
 import { TextInput } from '../../ui/TextInput'
-import { useRouter } from 'next/navigation'
 
 interface SocialButton {
   icon: ForwardRefExoticComponent<
     Omit<LucideProps, 'ref'> & RefAttributes<SVGSVGElement>
   >
   name: string
+  value: string
+  prefix: string
   setName: Dispatch<SetStateAction<string>>
 }
 
-export function EditSocialLinks() {
+export function EditSocialLinks({
+  socialMedias,
+}: {
+  socialMedias?: {
+    github: string
+    instagram: string
+    linkedin: string
+    twitter: string
+  }
+}) {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isSavingSocialLinks, setIsSavingSocialLinks] = useState(false)
 
-  const [github, setGithub] = useState('')
-  const [instagram, setInstagram] = useState('')
-  const [linkedin, setLinkedin] = useState('')
-  const [twitter, setTwitter] = useState('')
+  const [github, setGithub] = useState(socialMedias?.github || '')
+  const [instagram, setInstagram] = useState(socialMedias?.instagram || '')
+  const [linkedin, setLinkedin] = useState(socialMedias?.linkedin || '')
+  const [twitter, setTwitter] = useState(socialMedias?.twitter || '')
 
   const { profileId } = useParams()
 
@@ -48,21 +58,29 @@ export function EditSocialLinks() {
     {
       icon: Github,
       name: 'Github',
+      value: github,
+      prefix: 'https://github.com/',
       setName: setGithub,
     },
     {
       icon: Instagram,
       name: 'Instagram',
+      value: instagram,
+      prefix: 'https://instagram.com/',
       setName: setInstagram,
     },
     {
       icon: Linkedin,
       name: 'Linkedin',
+      value: linkedin,
+      prefix: 'https://linkedin.com/in/',
       setName: setLinkedin,
     },
     {
       icon: Twitter,
       name: 'Twitter',
+      value: twitter,
+      prefix: 'https://twitter.com/',
       setName: setTwitter,
     },
   ]
@@ -70,12 +88,16 @@ export function EditSocialLinks() {
   async function handleAddSocialLinks() {
     setIsSavingSocialLinks(true)
 
+    const linksToSend = {
+      github: github !== socialButtons[0].prefix ? github : '',
+      instagram: instagram !== socialButtons[1].prefix ? instagram : '',
+      linkedin: linkedin !== socialButtons[2].prefix ? linkedin : '',
+      twitter: twitter !== socialButtons[3].prefix ? twitter : '',
+    }
+
     await addSocialLinks({
       profileId: typeof profileId === 'string' ? profileId : '',
-      github,
-      instagram,
-      linkedin,
-      twitter,
+      ...linksToSend,
     })
 
     startTransition(() => {
@@ -105,22 +127,26 @@ export function EditSocialLinks() {
                 <TextInput
                   type="text"
                   placeholder={`Link ${button.name}`}
+                  value={button.value || button.prefix}
                   onChange={(e) => button.setName(e.target.value)}
                 />
               </div>
             ))}
           </div>
-        </div>
-        <div className="flex gap-4 justify-end">
-          <button
-            onClick={() => setIsModalOpen(false)}
-            className="font-bold text-white"
-          >
-            Voltar
-          </button>
-          <Button onClick={handleAddSocialLinks} disabled={isSavingSocialLinks}>
-            Salvar
-          </Button>
+          <div className="flex gap-4 justify-end">
+            <button
+              onClick={() => setIsModalOpen(false)}
+              className="font-bold text-white"
+            >
+              Voltar
+            </button>
+            <Button
+              onClick={handleAddSocialLinks}
+              disabled={isSavingSocialLinks}
+            >
+              Salvar
+            </Button>
+          </div>
         </div>
       </Modal>
     </>
